@@ -1,0 +1,41 @@
+{
+  "name": "react-native-storage-service",
+  "version": "0.0.1",
+  "description": "Service for caching and queueing http requests.",
+  "main": "dist/react-native-storage-service.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prod": "rollup -c rollup.config.js",
+    "example": "rollup -c example/rollup.config.js",
+    "lint": "tslint 'src/**/*.{ts,tsx}'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TwilightOwl/react-native-storage-service"
+  },
+  "author": "Denis Zhelnerovich",
+  "license": "ISC",
+  "dependencies": {
+    "asynchronous-tools": "https://github.com/TwilightOwl/asynchronous-tools"
+  },
+  "peerDependencies": {
+    "@react-native-community/async-storage": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^16.4.11",
+    "@types/react-dom": "^16.9.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "rollup": "^1.20.0",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-commonjs": "^9.1.5",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-postcss": "^2.0.3",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-plugin-typescript2": "0.24.2",
+    "tslib": "^1.10.0",
+    "typescript": "3.5.3"
+  }
+}
