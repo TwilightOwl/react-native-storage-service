@@ -235,7 +235,7 @@ export class Storage<T extends Types.StorageServiceConstructor> {
     //this.newInit();
   }
 
-  private add = <T>(name: string) => {
+  public add = <T>(name: string) => {
     Object.defineProperty(
       this, 
       name, 

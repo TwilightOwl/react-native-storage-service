@@ -2,44 +2,55 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import StorageService from '../../src';
-
-window.StorageService = StorageService;
-
-// interface Items {
-//   privateItems: [
-//     'PrivateA',
-//     'PrivateB'
-//   ],
-//   publicItems: [
-//     'PublicA',
-//     'PublicB'
-//   ]
-// }
-
-const service = new StorageService({
-  storageAccessors: {
-    setItem: async (key, value) => localStorage.setItem(key, value),
-    getItem: async key => localStorage.getItem(key),
-    removeItem: async key => localStorage.removeItem(key),
-    getAllKeys: async () => Object.keys(localStorage)
-  },
-  privateItems: [
-    'a',
-    'b'
-  ],
-  publicItems: [
-    'A',
-    'B'
-  ]
-});
+import { create, _ } from '../../src/creator';
 
 
 
+// window.StorageService = StorageService;
 
+        // const ss = new StorageService({
+        //   storageAccessors: {
+        //     setItem: async (key, value) => localStorage.setItem(key, value),
+        //     getItem: async key => localStorage.getItem(key),
+        //     removeItem: async key => localStorage.removeItem(key),
+        //     getAllKeys: async () => Object.keys(localStorage)
+        //   },
+        //   privateItems: [
+        //     'a',
+        //     'b'
+        //   ],
+        //   publicItems: [
+        //     'A',
+        //     'B'
+        //   ]
+        // });
+        
+        // type S = typeof ss;
+        // const s: S = ss;
+        // s
 
-window.service = service
+const storage = create({
+    storageAccessors: {
+      setItem: async (key, value) => localStorage.setItem(key, value),
+      getItem: async key => localStorage.getItem(key),
+      removeItem: async key => localStorage.removeItem(key),
+      getAllKeys: async () => Object.keys(localStorage)
+    }
+  })
+  .add('a', _ as number)
+  .add('b', _ as boolean)
+  .build()
 
+const f = async () => {
+  console.log('res: start')
+  const r: number = await storage.a
+  console.log('res: start storage.a getter', await storage.a)
+  await (storage.a = 4)
+  console.log('res: start storage.a setter')
 
+  TODO: проверить как будут работать асинхронные геттеры и сеттеры, если ничего не выйдет с этим, то сделать через обычные функции get и set
+  попробовать отдельно сделать простой класс с асинхронными типизированными геттером и сеттером и поиграться с ними
+}
 
 class App extends React.Component {
 

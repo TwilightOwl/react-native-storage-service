@@ -14,7 +14,7 @@ export interface Items {
 }
 
 
-export interface StorageServiceConstructor extends Items {
+export interface StorageServiceConstructor /*extends Items*/ {
   storageAccessors: StorageAccessors
 }
 
