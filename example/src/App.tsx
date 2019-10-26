@@ -5,7 +5,6 @@ import StorageService from '../../src';
 import { create, _ } from '../../src/creator';
 
 
-
 // window.StorageService = StorageService;
 
         // const ss = new StorageService({
@@ -29,6 +28,7 @@ import { create, _ } from '../../src/creator';
         // const s: S = ss;
         // s
 
+
 const storage = create({
     storageAccessors: {
       setItem: async (key, value) => localStorage.setItem(key, value),
@@ -37,23 +37,27 @@ const storage = create({
       getAllKeys: async () => Object.keys(localStorage)
     }
   })
-  .add('a', _ as number)
-  .add('b', _ as boolean)
-  .build()
+  .addPublic('A', _ as number)
+  .addPrivate('b', _ as boolean)
+  .addPrivate('c', _ as { a: { b: number[] }})
+  .build();
 
-const f = async () => {
-  console.log('res: start')
-  const r: number = await storage.a
-  console.log('res: start storage.a getter', await storage.a)
-  await (storage.a = 4)
-  console.log('res: start storage.a setter')
+(async () => {
+  await storage.login('user')
+  await new Promise(r => setTimeout(r, 5000))
+  await storage.b.set(true)
+  storage.A.set(10)
+  storage.A.get().then(console.log)
+  storage.c.set({a:{b: [1,2,3]}})
+})()
 
-  TODO: проверить как будут работать асинхронные геттеры и сеттеры, если ничего не выйдет с этим, то сделать через обычные функции get и set
-  попробовать отдельно сделать простой класс с асинхронными типизированными геттером и сеттером и поиграться с ними
-}
+window.storage = storage;
+
+  //debugger;
+
 
 class App extends React.Component {
-
+/*
   constructor(props) {
     super(props)
     // this.retrieve();
@@ -92,6 +96,9 @@ class App extends React.Component {
       </div>
     );
   }
+  */
+  
+  render() { return <div></div> }
 }
 
 export default App;

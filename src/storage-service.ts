@@ -146,56 +146,9 @@ export class Storage<T extends Types.StorageServiceConstructor> {
 
   constructor(props: T) {
 
-    // type R = T['publicItems'];
-
-    // const p = { pub: ['a', 'b'] };
-    // interface Cons {
-    //   pub: string[]
-    // }
-    // const f = <A extends Cons>(arg: A) => {
-    //   type K = A['pub'] extends (infer S)[] ? S : never;
-    //   type R = {
-    //     [k in K]: number
-    //   }
-    //   return {} as R
-    // }
-    // const ins = f(p);
-    // ins.a
-    // ins.b
-    // ins.x
-    // ins.pub
-
-    
-    
-    // const f = <A extends string>(arg: A[]) => {
-    //   type U = { [K in A]: number }
-    //   return { } as U
-    // }
-    // const ins = f(['a', 'b']);
-    
-    interface Cons {
-      pub: string[]
-    }
-    const f = <A extends Cons>(arg: A) => {
-      type B = A['pub'] extends (infer S)[] ? S : never;
-      type W = A['pub']
-      
-      type R = {
-        [K in B]: number
-      }
-      return {} as R
-    }
-    const ins = f({ pub: ['a', 'b'] }); // as const !!!
-
-    ins.a
-    ins.b
-    ins.x
-    ins.pub
-    
-
-
     const { storageAccessors, ...items } = props;
 
+    // TODO: Во входных параметрах теперь нету publicItems и privateItems, сделать старое добавление методов в функции add (нужно ли?)
     const { publicItems = [], privateItems = [] } = items;
 
     this.accessors = storageAccessors;
@@ -212,7 +165,7 @@ export class Storage<T extends Types.StorageServiceConstructor> {
 
     // This code generates public setters and getters for items
     privateItems.forEach(item => {
-      this.add(item);
+      //this.add(item);
       ['set', 'get'].forEach(
         method => {
           this[`${method}${item}`] = this[`_${method}PrivateItem`](item)
@@ -235,7 +188,13 @@ export class Storage<T extends Types.StorageServiceConstructor> {
     //this.newInit();
   }
 
-  public add = <T>(name: string) => {
+  public add = <T>(name: string, isPrivate = true) => {
+    // Нельзя работать с асинхронными геттерами и сеттерами: 
+    //  - нельзя дождаться выполнения асинхронного сеттера из вызывающего кода
+    //  - проблематично описывать типы
+    //  - метод для удаления придется делать отдельно от геттера/сеттера
+    //  - неочевидное использование
+    /*
     Object.defineProperty(
       this, 
       name, 
@@ -247,9 +206,40 @@ export class Storage<T extends Types.StorageServiceConstructor> {
           return this._setPrivateItem<T>(name)(value)
         }
       }
-    )
+    )*/
+    Object.defineProperty(
+      this, name, {
+        value: {
+          set: (value: T): Promise<void> => isPrivate
+            ? this._setPrivateItem<T>(name)(value)
+            : this._setPublicItem<T>(name)(value)
+          ,
+          get: (): Promise<T> => isPrivate
+            ? this._getPrivateItem<T>(name)()
+            : this._getPublicItem<T>(name)()
+          ,
+          remove: () => { throw 'TODO' }
+        }
+      }
+    );
+    return null as unknown as {
+      set: (value: T) => Promise<void>,
+      get: () => Promise<T>,
+      remove: () => Promise<void>
+    }
+    /*
+    this[name] = {
+      set: (value: T): Promise<void> => {
+        return this._setPrivateItem<T>(name)(value)
+      },
+      get: (): Promise<T> => {
+        return this._getPrivateItem<T>(name)()
+      },
+      remove: () => { throw 'TODO' }
+    }*/
   }
 
+  // Плохая идея, т.к. login можем вообще не вызывать и подефолту должны проинициализироваться с общим пользователем и под ним и работать
   // @aiInit
   // public async newInit() {
   //   return await this.retrieveCurrentUser() === undefined
@@ -262,8 +252,10 @@ export class Storage<T extends Types.StorageServiceConstructor> {
     return this.retrieveCurrentUser();
   }
 
-  private setUser = async (id: string): Promise<void> => {
+  @aiMethod
+  private async setUser(id: string): Promise<void> {
     this._user = id;
+    console.log('   setUser', this._user)
     await this.accessors.setItem(CURRENT_USER_KEY, id);
     // if (this.initResolve) {
     //   this.initResolve();
@@ -277,12 +269,15 @@ export class Storage<T extends Types.StorageServiceConstructor> {
 
   @aiMethod
   public getUser() {
-    console.log('getUser')
+    console.log('getUser', this._user)
     return this._user === undefined ? this.retrieveCurrentUser() : this._user;
   }
 
   public retrieveCurrentUser = async (): Promise<string> => {
-    return (this._user = await this.accessors.getItem(CURRENT_USER_KEY) || COMMON_DATA_KEY);
+    console.log('retrieveCurrentUser begin')
+    const result = (this._user = await this.accessors.getItem(CURRENT_USER_KEY) || COMMON_DATA_KEY);
+    console.log('retrieveCurrentUser end', result)
+    return result
   };
 
   public _show =
@@ -313,6 +308,7 @@ export class Storage<T extends Types.StorageServiceConstructor> {
   
   public getAllKeys = async (): Promise<string[]> => {
     const prefix = this.getUserPrefix(await this.getUser());
+    console.log('prefix', prefix)
     const getPublicKey = (key: string): string =>
       key.substr(0, prefix.length) === prefix
         ? key.substr(prefix.length)
@@ -341,6 +337,9 @@ export class Storage<T extends Types.StorageServiceConstructor> {
   private _setPrivateItem = <T>(key: string) => async (
     value: T
   ): Promise<void> => {
+    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
+    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
+    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
     //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
     //const currentUser = await this.getUser();
     //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
@@ -351,6 +350,9 @@ export class Storage<T extends Types.StorageServiceConstructor> {
   };
 
   private _getPrivateItem = <T>(key: string) => async (): Promise<T> => {
+    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
+    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
+    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
     //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
     //const currentUser = await this.getUser();
     //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
@@ -359,8 +361,8 @@ export class Storage<T extends Types.StorageServiceConstructor> {
     ) as T;
   };
 
-  private _setPublicItem = (key: string) => async (
-    value: any
+  private _setPublicItem = <T>(key: string) => async (
+    value: T
   ): Promise<any> => {
     return this.accessors.setItem(
       (await this._key(key, COMMON_DATA_KEY) as string),
@@ -368,12 +370,12 @@ export class Storage<T extends Types.StorageServiceConstructor> {
     );
   };
 
-  private _getPublicItem = (key: string) => async (): Promise<any> => {
+  private _getPublicItem = <T>(key: string) => async (): Promise<T> => {
     return JSON.parse(
       await this.accessors.getItem(
         await this._key(key, COMMON_DATA_KEY) as string
       )
-    );
+    ) as T
   };
 
   private getUserPrefix = (userId: string) => `${STORAGE_PREFIX}-user-${userId}:`;

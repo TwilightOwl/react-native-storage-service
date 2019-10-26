@@ -28924,12 +28924,6 @@
 	    }
 	}); };
 
-	// const l: [string, number, 'x'][] = [['a',0,'x'], ['b',2,'x']]
-
-	var Types = /*#__PURE__*/Object.freeze({
-		__proto__: null
-	});
-
 	/**
 	 * @author Denis Zhelnerovich
 	 * @version 1.0
@@ -29064,28 +29058,49 @@
 	var Storage = /** @class */ (function () {
 	    function Storage(props) {
 	        var _this = this;
-	        this.add = function (name) {
-	            Object.defineProperty(_this, name, {
-	                get: function () {
-	                    return _this._getPrivateItem(name)();
+	        this.add = function (name, isPrivate) {
+	            if (isPrivate === void 0) { isPrivate = true; }
+	            // Нельзя работать с асинхронными геттерами и сеттерами: 
+	            //  - нельзя дождаться выполнения асинхронного сеттера из вызывающего кода
+	            //  - проблематично описывать типы
+	            //  - метод для удаления придется делать отдельно от геттера/сеттера
+	            //  - неочевидное использование
+	            /*
+	            Object.defineProperty(
+	              this,
+	              name,
+	              {
+	                get: (): Promise<T> => {
+	                  return this._getPrivateItem<T>(name)()
 	                },
-	                set: function (value) {
-	                    return _this._setPrivateItem(name)(value);
+	                set: (value: T): Promise<void> => {
+	                  return this._setPrivateItem<T>(name)(value)
+	                }
+	              }
+	            )*/
+	            Object.defineProperty(_this, name, {
+	                value: {
+	                    set: function (value) { return isPrivate
+	                        ? _this._setPrivateItem(name)(value)
+	                        : _this._setPublicItem(name)(value); },
+	                    get: function () { return isPrivate
+	                        ? _this._getPrivateItem(name)()
+	                        : _this._getPublicItem(name)(); },
+	                    remove: function () { throw 'TODO'; }
 	                }
 	            });
+	            return null;
+	            /*
+	            this[name] = {
+	              set: (value: T): Promise<void> => {
+	                return this._setPrivateItem<T>(name)(value)
+	              },
+	              get: (): Promise<T> => {
+	                return this._getPrivateItem<T>(name)()
+	              },
+	              remove: () => { throw 'TODO' }
+	            }*/
 	        };
-	        this.setUser = function (id) { return __awaiter(_this, void 0, Promise, function () {
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0:
-	                        this._user = id;
-	                        return [4 /*yield*/, this.accessors.setItem(CURRENT_USER_KEY, id)];
-	                    case 1:
-	                        _a.sent();
-	                        return [2 /*return*/];
-	                }
-	            });
-	        }); };
 	        this.login = function (userId) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, this.setUser(userId)];
 	        }); }); };
@@ -29093,13 +29108,17 @@
 	            return [2 /*return*/, this.setUser(COMMON_DATA_KEY)];
 	        }); }); };
 	        this.retrieveCurrentUser = function () { return __awaiter(_this, void 0, Promise, function () {
-	            var _a;
+	            var result, _a;
 	            return __generator(this, function (_b) {
 	                switch (_b.label) {
 	                    case 0:
+	                        console.log('retrieveCurrentUser begin');
 	                        _a = this;
 	                        return [4 /*yield*/, this.accessors.getItem(CURRENT_USER_KEY)];
-	                    case 1: return [2 /*return*/, (_a._user = (_b.sent()) || COMMON_DATA_KEY)];
+	                    case 1:
+	                        result = (_a._user = (_b.sent()) || COMMON_DATA_KEY);
+	                        console.log('retrieveCurrentUser end', result);
+	                        return [2 /*return*/, result];
 	                }
 	            });
 	        }); };
@@ -29171,6 +29190,7 @@
 	                        return [4 /*yield*/, this.getUser()];
 	                    case 1:
 	                        prefix = _a.apply(this, [_b.sent()]);
+	                        console.log('prefix', prefix);
 	                        getPublicKey = function (key) {
 	                            return key.substr(0, prefix.length) === prefix
 	                                ? key.substr(prefix.length)
@@ -29230,12 +29250,18 @@
 	                        _b = (_a = this.accessors).setItem;
 	                        return [4 /*yield*/, this._key(key)];
 	                    case 1: 
+	                    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
+	                    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
+	                    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
 	                    //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
 	                    //const currentUser = await this.getUser();
 	                    //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
 	                    return [4 /*yield*/, _b.apply(_a, [(_c.sent()),
 	                            JSON.stringify(value)])];
 	                    case 2:
+	                        // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
+	                        // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
+	                        // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
 	                        //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
 	                        //const currentUser = await this.getUser();
 	                        //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
@@ -29254,6 +29280,9 @@
 	                        return [4 /*yield*/, this._key(key)];
 	                    case 1: return [4 /*yield*/, _d.apply(_c, [(_e.sent())])];
 	                    case 2: 
+	                    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
+	                    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
+	                    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
 	                    //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
 	                    //const currentUser = await this.getUser();
 	                    //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
@@ -29288,6 +29317,7 @@
 	        }); }; };
 	        this.getUserPrefix = function (userId) { return STORAGE_PREFIX + "-user-" + userId + ":"; };
 	        var storageAccessors = props.storageAccessors, items = __rest(props, ["storageAccessors"]);
+	        // TODO: Во входных параметрах теперь нету publicItems и privateItems, сделать старое добавление методов в функции add (нужно ли?)
 	        var _a = items.publicItems, publicItems = _a === void 0 ? [] : _a, _b = items.privateItems, privateItems = _b === void 0 ? [] : _b;
 	        this.accessors = storageAccessors;
 	        if (!this.accessors.multiSet) {
@@ -29311,7 +29341,7 @@
 	        }
 	        // This code generates public setters and getters for items
 	        privateItems.forEach(function (item) {
-	            _this.add(item);
+	            //this.add(item);
 	            ['set', 'get'].forEach(function (method) {
 	                _this["" + method + item] = _this["_" + method + "PrivateItem"](item);
 	            });
@@ -29332,6 +29362,7 @@
 	        //global.S = this;
 	        //this.newInit();
 	    }
+	    // Плохая идея, т.к. login можем вообще не вызывать и подефолту должны проинициализироваться с общим пользователем и под ним и работать
 	    // @aiInit
 	    // public async newInit() {
 	    //   return await this.retrieveCurrentUser() === undefined
@@ -29341,8 +29372,23 @@
 	    Storage.prototype.init = function () {
 	        return this.retrieveCurrentUser();
 	    };
+	    Storage.prototype.setUser = function (id) {
+	        return __awaiter(this, void 0, Promise, function () {
+	            return __generator(this, function (_a) {
+	                switch (_a.label) {
+	                    case 0:
+	                        this._user = id;
+	                        console.log('   setUser', this._user);
+	                        return [4 /*yield*/, this.accessors.setItem(CURRENT_USER_KEY, id)];
+	                    case 1:
+	                        _a.sent();
+	                        return [2 /*return*/];
+	                }
+	            });
+	        });
+	    };
 	    Storage.prototype.getUser = function () {
-	        console.log('getUser');
+	        console.log('getUser', this._user);
 	        return this._user === undefined ? this.retrieveCurrentUser() : this._user;
 	    };
 	    var _a;
@@ -29355,29 +29401,74 @@
 	    __decorate([
 	        aiMethod,
 	        __metadata("design:type", Function),
+	        __metadata("design:paramtypes", [String]),
+	        __metadata("design:returntype", typeof (_a = typeof Promise !== "undefined" && Promise) === "function" ? _a : Object)
+	    ], Storage.prototype, "setUser", null);
+	    __decorate([
+	        aiMethod,
+	        __metadata("design:type", Function),
 	        __metadata("design:paramtypes", []),
 	        __metadata("design:returntype", void 0)
 	    ], Storage.prototype, "getUser", null);
 	    Storage = __decorate([
 	        aiWithAsyncInit,
-	        __metadata("design:paramtypes", [typeof (_a = typeof Types !== "undefined" && undefined) === "function" ? _a : Object])
+	        __metadata("design:paramtypes", [Object])
 	    ], Storage);
 	    return Storage;
 	}());
 
+	var create = function (props) {
+	    // Create storage
+	    // const Storage = { anyPreviousMethod: 3 };
+	    var storage = new Storage(props);
+	    var add = function (target, isPrivate) {
+	        if (isPrivate === void 0) { isPrivate = true; }
+	        return function (name, t) {
+	            var typedStubValue = storage.add(name, isPrivate);
+	            // interface Result extends Q {
+	            //     [k in X]: T
+	            // }
+	            // return Storage as { A: { set: (value: T) => void, get: () => T } }
+	            return {
+	                //add: add(target as K),
+	                build: function () { return target; },
+	                addPrivate: addPrivate(target),
+	                addPublic: addPublic(target)
+	            };
+	        };
+	    };
+	    var addPrivate = function (target) { return add(target); };
+	    var addPublic = function (target) { return add(target, false); };
+	    return {
+	        //add: add(storage),
+	        addPrivate: addPrivate(storage),
+	        addPublic: addPublic(storage)
+	    };
+	};
+	var _ = null;
+
 	var _this$1 = undefined;
-	window.StorageService = Storage;
-	// interface Items {
+	// window.StorageService = StorageService;
+	// const ss = new StorageService({
+	//   storageAccessors: {
+	//     setItem: async (key, value) => localStorage.setItem(key, value),
+	//     getItem: async key => localStorage.getItem(key),
+	//     removeItem: async key => localStorage.removeItem(key),
+	//     getAllKeys: async () => Object.keys(localStorage)
+	//   },
 	//   privateItems: [
-	//     'PrivateA',
-	//     'PrivateB'
+	//     'a',
+	//     'b'
 	//   ],
 	//   publicItems: [
-	//     'PublicA',
-	//     'PublicB'
+	//     'A',
+	//     'B'
 	//   ]
-	// }
-	var service = new Storage({
+	// });
+	// type S = typeof ss;
+	// const s: S = ss;
+	// s
+	var storage = create({
 	    storageAccessors: {
 	        setItem: function (key, value) { return __awaiter(_this$1, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, localStorage.setItem(key, value)];
@@ -29391,82 +29482,79 @@
 	        getAllKeys: function () { return __awaiter(_this$1, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, Object.keys(localStorage)];
 	        }); }); }
-	    },
-	    privateItems: [
-	        'a',
-	        'b'
-	    ],
-	    publicItems: [
-	        'A',
-	        'B'
-	    ]
-	});
-	window.service = service;
+	    }
+	})
+	    .addPublic('A', _)
+	    .addPrivate('b', _)
+	    .addPrivate('c', _)
+	    .build();
+	(function () { return __awaiter(_this$1, void 0, void 0, function () {
+	    return __generator(this, function (_a) {
+	        switch (_a.label) {
+	            case 0: return [4 /*yield*/, storage.login('user')];
+	            case 1:
+	                _a.sent();
+	                return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 5000); })];
+	            case 2:
+	                _a.sent();
+	                return [4 /*yield*/, storage.b.set(true)];
+	            case 3:
+	                _a.sent();
+	                storage.A.set(10);
+	                storage.A.get().then(console.log);
+	                storage.c.set({ a: { b: [1, 2, 3] } });
+	                return [2 /*return*/];
+	        }
+	    });
+	}); })();
+	window.storage = storage;
+	//debugger;
 	var App = /** @class */ (function (_super) {
 	    __extends(App, _super);
-	    function App(props) {
-	        var _this = _super.call(this, props) || this;
-	        _this.init = function () { return service.init(); };
-	        _this.setPrivateA = function () { return __awaiter(_this, void 0, void 0, function () {
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0: return [4 /*yield*/, service.setPrivateA(1)];
-	                    case 1:
-	                        _a.sent();
-	                        this.retrieve();
-	                        return [2 /*return*/];
-	                }
-	            });
-	        }); };
-	        _this.setPrivateB = function () { return __awaiter(_this, void 0, void 0, function () {
-	            return __generator(this, function (_a) {
-	                switch (_a.label) {
-	                    case 0: return [4 /*yield*/, service.setPrivateB(2)];
-	                    case 1:
-	                        _a.sent();
-	                        this.retrieve();
-	                        return [2 /*return*/];
-	                }
-	            });
-	        }); };
-	        _this.retrieve = function () { return __awaiter(_this, void 0, void 0, function () {
-	            var _a, _b;
-	            return __generator(this, function (_c) {
-	                switch (_c.label) {
-	                    case 0:
-	                        _a = this.setState;
-	                        _b = {};
-	                        return [4 /*yield*/, service.getPrivateA()];
-	                    case 1:
-	                        _b.A = _c.sent();
-	                        return [4 /*yield*/, service.getPrivateB()];
-	                    case 2:
-	                        _a.apply(this, [(_b.B = _c.sent(),
-	                                _b)]);
-	                        return [2 /*return*/];
-	                }
-	            });
-	        }); };
-	        return _this;
-	        // this.retrieve();
+	    function App() {
+	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    App.prototype.render = function () {
-	        return (react.createElement("div", { className: "App" },
-	            react.createElement("br", null),
-	            JSON.stringify(this.state),
-	            react.createElement("br", null),
-	            react.createElement("br", null),
-	            react.createElement("br", null),
-	            react.createElement("button", { onClick: this.init }, "Init"),
-	            react.createElement("br", null),
-	            react.createElement("br", null),
-	            react.createElement("br", null),
-	            react.createElement("button", { onClick: this.setPrivateA }, "setPrivateA"),
-	            react.createElement("button", { onClick: this.setPrivateB }, "setPrivateB"),
-	            react.createElement("br", null),
-	            react.createElement("br", null),
-	            react.createElement("br", null)));
-	    };
+	    /*
+	      constructor(props) {
+	        super(props)
+	        // this.retrieve();
+	      }
+	    
+	      init = () => service.init()
+	    
+	      setPrivateA = async () => {
+	        await service.setPrivateA(1)
+	        this.retrieve()
+	      }
+	      
+	      setPrivateB = async () => {
+	        await service.setPrivateB(2)
+	        this.retrieve()
+	      }
+	    
+	      retrieve = async () => {
+	        this.setState({
+	          A: await service.getPrivateA(),
+	          B: await service.getPrivateB(),
+	        })
+	      }
+	    
+	      render() {
+	        return (
+	          <div className="App">
+	            <br/>
+	            {JSON.stringify(this.state)}
+	            <br/><br/><br/>
+	            <button onClick={this.init}>Init</button>
+	            <br/><br/><br/>
+	            <button onClick={this.setPrivateA}>setPrivateA</button>
+	            <button onClick={this.setPrivateB}>setPrivateB</button>
+	            <br/><br/><br/>
+	          </div>
+	        );
+	      }
+	      */
+	    App.prototype.render = function () { return react.createElement("div", null); };
 	    return App;
 	}(react.Component));
 
