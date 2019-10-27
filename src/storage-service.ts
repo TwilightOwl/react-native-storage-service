@@ -40,7 +40,6 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
   @aiMethod
   private async setUser(id: string): Promise<void> {
     this._user = id;
-    console.log('   setUser', this._user)
     await this.accessors.setItem(Types.Constants.CurrentUserKey, id);
     // if (this.initResolve) {
     //   this.initResolve();
@@ -54,14 +53,11 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
 
   @aiMethod
   public getUser() {
-    console.log('getUser', this._user)
     return this._user === undefined ? this.retrieveCurrentUser() : this._user;
   }
 
   public retrieveCurrentUser = async (): Promise<string> => {
-    console.log('retrieveCurrentUser begin')
     const result = (this._user = await this.accessors.getItem(Types.Constants.CurrentUserKey) || Types.Constants.CommonUser);
-    console.log('retrieveCurrentUser end', result)
     return result
   };
 
