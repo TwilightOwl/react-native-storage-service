@@ -11,10 +11,12 @@ const storage = CreateStorage({
       getAllKeys: async () => Object.keys(localStorage)
     }
   })
+  //.addPrivate('a', _ as number).addPrivate('b', _ as number).
   .addPublic('A', _ as number)
   .addPrivate('b', _ as boolean)
   .addPrivate('c', _ as { a: { b: number[] }})
   .build();
+  
 
 (async () => {
   await storage.login('user')

@@ -32,18 +32,51 @@ const addProperty = <T, Target>(name: string, isPrivate = true, target: Target) 
   }
 }
 
+
+interface AddResult<I> {
+  <PropertyName extends string, PropertyType, 
+  TargetWithAddedProperty = { [K in PropertyName]: PT<PropertyType> } & I,
+  R = T<TargetWithAddedProperty>
+  >(propertyName: PropertyName, propertyTypedStubValue: PropertyType): R
+}
+
+interface Add {
+  <I>(target: I, isPrivate?: boolean): AddResult<I>    
+}
+
+interface T<I> {
+  build: () => I,
+  addPrivate: AddResult<I>,
+  addPublic: AddResult<I>,
+}
+interface PT<T> {
+  set: (value: T) => Promise<void>,
+  get: () => Promise<T>,
+  remove: () => Promise<void>
+}
+
 export const createStorage = (props: StorageServiceConstructor) => {
-  const storage = new Storage(props)
-  const add = <Target>(target: Target, isPrivate = true) => (
-    <PropertyName extends string, PropertyType>(propertyName: PropertyName, propertyTypedStubValue: PropertyType) => {
-      const typedStubValue = addProperty<PropertyType, Target>(propertyName, isPrivate, target)
-      type AddedPropertyType = typeof typedStubValue
-      type TargetWithAddedProperty = { [K in PropertyName]: AddedPropertyType } & Target
+  const storage = new Storage(props);
+
+  const add = <Target>(target: Target, isPrivate: boolean = true) => (
+    <PropertyName extends string, 
+    PropertyType, 
+    TargetWithAddedProperty = { [K in PropertyName]: PT<PropertyType> } & Target,
+    R = T<TargetWithAddedProperty>
+    >(propertyName: PropertyName, propertyTypedStubValue: PropertyType): 
+      R => {
+      //const typedStubValue = 
+        addProperty<PropertyType, Target>(propertyName, isPrivate, target)
+      //type AddedPropertyType = typeof typedStubValue
+      //type AddedPropertyType = PT<PropertyType>
+      //type TargetWithAddedProperty = { [K in PropertyName]: AddedPropertyType } & Target
+      //type TargetWithAddedProperty = { [K in PropertyName]: PT<PropertyType> } & Target
+      
       return {
-        build: () => target as TargetWithAddedProperty,
-        addPrivate: addPrivate(target as TargetWithAddedProperty),
-        addPublic: addPublic(target as TargetWithAddedProperty)
-      }
+        build: () => target as unknown as TargetWithAddedProperty,
+        addPrivate: addPrivate(target as unknown as TargetWithAddedProperty),
+        addPublic: addPublic(target as unknown as TargetWithAddedProperty)
+      } as unknown as R
     }
   )
 
