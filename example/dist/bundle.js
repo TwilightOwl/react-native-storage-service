@@ -28933,12 +28933,10 @@
 	            return __generator(this, function (_b) {
 	                switch (_b.label) {
 	                    case 0:
-	                        console.log('retrieveCurrentUser begin');
 	                        _a = this;
 	                        return [4 /*yield*/, this.accessors.getItem(Constants.CurrentUserKey)];
 	                    case 1:
 	                        result = (_a._user = (_b.sent()) || Constants.CommonUser);
-	                        console.log('retrieveCurrentUser end', result);
 	                        return [2 /*return*/, result];
 	                }
 	            });
@@ -29166,7 +29164,6 @@
 	                switch (_a.label) {
 	                    case 0:
 	                        this._user = id;
-	                        console.log('   setUser', this._user);
 	                        return [4 /*yield*/, this.accessors.setItem(Constants.CurrentUserKey, id)];
 	                    case 1:
 	                        _a.sent();
@@ -29176,7 +29173,6 @@
 	        });
 	    };
 	    Storage.prototype.getUser = function () {
-	        console.log('getUser', this._user);
 	        return this._user === undefined ? this.retrieveCurrentUser() : this._user;
 	    };
 	    var _a;
@@ -29220,14 +29216,13 @@
 	            remove: function () { throw 'TODO'; }
 	        }
 	    });
-	    return null;
 	};
 	var createStorage = function (props) {
 	    var storage = new Storage(props);
 	    var add = function (target, isPrivate) {
 	        if (isPrivate === void 0) { isPrivate = true; }
 	        return (function (propertyName, propertyTypedStubValue) {
-	            var typedStubValue = addProperty(propertyName, isPrivate, target);
+	            addProperty(propertyName, isPrivate, target);
 	            return {
 	                build: function () { return target; },
 	                addPrivate: addPrivate(target),
@@ -29264,10 +29259,13 @@
 	        }); }); }
 	    }
 	})
+	    //.addPrivate('a', _ as number).addPrivate('b', _ as number).
 	    .addPublic('A', _)
 	    .addPrivate('b', _)
 	    .addPrivate('c', _)
 	    .build();
+	//addPrivate(propertyName: string, propertyTypedStubValue: unknown): IntermediateObject<{ [x: string]: PropertyAccessors<unknown>; } & Storage<StorageServiceConstructor>>
+	//addPrivate(propertyName: string, propertyTypedStubValue: unknown): IntermediateObject<{ [x: string]: PropertyAccessors<unknown>; } & { a: PropertyAccessors<Function>; } & Storage<StorageServiceConstructor>>
 	(function () { return __awaiter(_this$1, void 0, void 0, function () {
 	    return __generator(this, function (_a) {
 	        switch (_a.label) {

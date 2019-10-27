@@ -366,18 +366,13 @@ var addProperty = function (name, isPrivate, target) {
             remove: function () { throw 'TODO'; }
         }
     });
-    return null;
 };
 var createStorage = function (props) {
     var storage = new Storage(props);
     var add = function (target, isPrivate) {
         if (isPrivate === void 0) { isPrivate = true; }
         return (function (propertyName, propertyTypedStubValue) {
-            var typedStubValue = addProperty(propertyName, isPrivate, target);
-            //type AddedPropertyType = typeof typedStubValue
-            //type AddedPropertyType = PT<PropertyType>
-            //type TargetWithAddedProperty = { [K in PropertyName]: AddedPropertyType } & Target
-            //type TargetWithAddedProperty = { [K in PropertyName]: PT<PropertyType> } & Target
+            addProperty(propertyName, isPrivate, target);
             return {
                 build: function () { return target; },
                 addPrivate: addPrivate(target),
