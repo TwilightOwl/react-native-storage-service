@@ -1,2 +1,2 @@
-export { default as default } from './storage-service';
-
+export { default } from './creator'
+export * from './creator'

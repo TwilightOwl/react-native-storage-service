@@ -8,14 +8,12 @@ export interface StorageAccessors {
   multiRemove?: (keys: string[]) => Promise<void>,
 }
 
-export interface Items {
-  publicItems?: string[],
-  privateItems?: string[]
-}
-
-
-export interface StorageServiceConstructor /*extends Items*/ {
+export interface StorageServiceConstructor {
   storageAccessors: StorageAccessors
 }
 
-// const l: [string, number, 'x'][] = [['a',0,'x'], ['b',2,'x']]
+export enum Constants {
+  StoragePrefix = 'storage-service',
+  CurrentUserKey = 'storage-service-current-user:',
+  CommonUser = 'common',
+}

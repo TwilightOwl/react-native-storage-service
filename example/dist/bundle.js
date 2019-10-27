@@ -28568,18 +28568,6 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	}
 
-	function __rest(s, e) {
-	    var t = {};
-	    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-	        t[p] = s[p];
-	    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-	        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-	            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-	                t[p[i]] = s[p[i]];
-	        }
-	    return t;
-	}
-
 	function __decorate(decorators, target, key, desc) {
 	    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
 	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -28924,188 +28912,21 @@
 	    }
 	}); };
 
-	/**
-	 * @author Denis Zhelnerovich
-	 * @version 1.0
-	 */
-	var STORAGE_PREFIX = 'storage-service';
-	var CURRENT_USER_KEY = STORAGE_PREFIX + '-current-user:';
-	var COMMON_DATA_KEY = 'common';
-	/*
+	var Constants;
+	(function (Constants) {
+	    Constants["StoragePrefix"] = "storage-service";
+	    Constants["CurrentUserKey"] = "storage-service-current-user:";
+	    Constants["CommonUser"] = "common";
+	})(Constants || (Constants = {}));
 
-	function functionGenerator<T extends string, U = { [K in T]?: string }> (keys: T[]): (p: U) => U {
-	  return (p: U) => p
-	}
-
-	const testFun = functionGenerator(['one', 'two'])
-
-	const r1 = testFun({one: '1'}) // no error
-	const r2 = testFun({two: '2'}) // no error
-	//testFun({three: '3'}) // no error
-	console.log(r1,r2)
-	debugger;
-
-
-	const obj = {one: 1, two: 2}
-	type Prop = {
-	  [k in keyof typeof obj]?: string;
-	}
-	function test(p: Prop) {
-	  return p;
-	}
-
-	test({three: '3'}) // throws an error
-
-
-	interface Args {
-	  private: string[],
-	  public: string[]
-	}
-
-	const pre = { private: ['a1', 'a2'], public: ['b1', 'b2']};
-	const priv = ['a1', 'a2'];
-
-	// <T extends string, U = { [K in T]?: string }> (keys: T[])
-	const create = <T1 extends string, U = { [K in T1]?: string }> (args: { private: T1[] }) => {
-	  // { private: ['a1', 'a2'], public: ['b1', 'b2']}
-	  // type T = {
-	  //   [k in keyof typeof pre]: number;
-	  //   //[k in priv]: number;
-	  // }
-
-	  const pr: T1[] = args.private;
-	  const asLiterals = <T extends string>(arr: T[]): T[] => arr;
-	  const setpr = pr.map((key: T1) => `set${key}`);
-	  
-
-	const rr = `set${4}`;
-
-	  type tsad = typeof rr
-	  
-	  type TT = typeof setpr[number]
-	  
-	  const acss = pr.reduce((acc, key) => ({ ...acc,
-	    [`set${key}`]: 1,
-	    [`get${key}`]: 2
-	  }), {} as { [k in T1]: number })
-
-	  const keys = asLiterals(Object.keys(acss))
-	  const tt = typeof keys
-
-	  const P = asLiterals(pr)
-	  type D = typeof keys[number]
-	  type D2 = typeof P[number]
-	  
-	  // const keys = asLiterals(['a', 'b', 'c']);
-	  
-
-	  type Acs = ['get', 'set']
-	  const a = '1'
-	  type A = [typeof a]
-	  
-	  const ar = ['ar'];
-	  type Tar = typeof ar;
-	  const sar = [`s${ar[0]}`]
-	  type Tsar = typeof sar;
-	  const tar: Tar = ['as']
-
-	  type aaa = keyof typeof ar;
-
-
-	  type t = typeof acss
-
-	  type R = {
-	    //[k in keyof U]: number
-	    //[k in keyof typeof keys]: number
-	    //[k in keyof typeof acss]: number
-	    [k in T1]: number
-	    //[k in typeof setpr[number]]: number
-	    //[k in ('a1'|'a2')]: number
-	  }
-
-	  const result: R = args.private.reduce((acc, key) => ({ ...acc, [key]: 1}), {} as R)
-	  return result
-	}
-
-	const ins1 = create({ private: [`a1`, `a2`] });
-	ins1.a1;
-	ins1.seta1;
-	ins1.a3;
-
-	const s = `s${4}`
-	const s2 = `s2`
-
-	interface II {
-	  [s]: 'as'
-	}
-
-
-	class S {
-	  constructor(args: string[]): S {
-	    args.forEach((key, index) => this[key] = index)
-	  }
-	}
-
-	interface IS extends S {}
-
-	const inst = new S(['a', 'b'])
-
-	type t = typeof inst
-
-	inst.a
-
-	*/
 	var Storage = /** @class */ (function () {
 	    function Storage(props) {
 	        var _this = this;
-	        this.add = function (name, isPrivate) {
-	            if (isPrivate === void 0) { isPrivate = true; }
-	            // Нельзя работать с асинхронными геттерами и сеттерами: 
-	            //  - нельзя дождаться выполнения асинхронного сеттера из вызывающего кода
-	            //  - проблематично описывать типы
-	            //  - метод для удаления придется делать отдельно от геттера/сеттера
-	            //  - неочевидное использование
-	            /*
-	            Object.defineProperty(
-	              this,
-	              name,
-	              {
-	                get: (): Promise<T> => {
-	                  return this._getPrivateItem<T>(name)()
-	                },
-	                set: (value: T): Promise<void> => {
-	                  return this._setPrivateItem<T>(name)(value)
-	                }
-	              }
-	            )*/
-	            Object.defineProperty(_this, name, {
-	                value: {
-	                    set: function (value) { return isPrivate
-	                        ? _this._setPrivateItem(name)(value)
-	                        : _this._setPublicItem(name)(value); },
-	                    get: function () { return isPrivate
-	                        ? _this._getPrivateItem(name)()
-	                        : _this._getPublicItem(name)(); },
-	                    remove: function () { throw 'TODO'; }
-	                }
-	            });
-	            return null;
-	            /*
-	            this[name] = {
-	              set: (value: T): Promise<void> => {
-	                return this._setPrivateItem<T>(name)(value)
-	              },
-	              get: (): Promise<T> => {
-	                return this._getPrivateItem<T>(name)()
-	              },
-	              remove: () => { throw 'TODO' }
-	            }*/
-	        };
 	        this.login = function (userId) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, this.setUser(userId)];
 	        }); }); };
 	        this.logout = function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-	            return [2 /*return*/, this.setUser(COMMON_DATA_KEY)];
+	            return [2 /*return*/, this.setUser(Constants.CommonUser)];
 	        }); }); };
 	        this.retrieveCurrentUser = function () { return __awaiter(_this, void 0, Promise, function () {
 	            var result, _a;
@@ -29114,9 +28935,9 @@
 	                    case 0:
 	                        console.log('retrieveCurrentUser begin');
 	                        _a = this;
-	                        return [4 /*yield*/, this.accessors.getItem(CURRENT_USER_KEY)];
+	                        return [4 /*yield*/, this.accessors.getItem(Constants.CurrentUserKey)];
 	                    case 1:
-	                        result = (_a._user = (_b.sent()) || COMMON_DATA_KEY);
+	                        result = (_a._user = (_b.sent()) || Constants.CommonUser);
 	                        console.log('retrieveCurrentUser end', result);
 	                        return [2 /*return*/, result];
 	                }
@@ -29190,7 +29011,6 @@
 	                        return [4 /*yield*/, this.getUser()];
 	                    case 1:
 	                        prefix = _a.apply(this, [_b.sent()]);
-	                        console.log('prefix', prefix);
 	                        getPublicKey = function (key) {
 	                            return key.substr(0, prefix.length) === prefix
 	                                ? key.substr(prefix.length)
@@ -29253,18 +29073,12 @@
 	                    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
 	                    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
 	                    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-	                    //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
-	                    //const currentUser = await this.getUser();
-	                    //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
 	                    return [4 /*yield*/, _b.apply(_a, [(_c.sent()),
 	                            JSON.stringify(value)])];
 	                    case 2:
 	                        // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
 	                        // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
 	                        // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-	                        //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
-	                        //const currentUser = await this.getUser();
-	                        //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
 	                        _c.sent();
 	                        return [2 /*return*/];
 	                }
@@ -29283,9 +29097,6 @@
 	                    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
 	                    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
 	                    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-	                    //TODO: если выбрасывать исключение, то в http сервисе когда не авторизованный все равно пытется получить доступ к deviceId в сторадже чтобы засунуть в хэдер
-	                    //const currentUser = await this.getUser();
-	                    //if (currentUser === COMMON_DATA_KEY) throw `Access to private field ${key}`
 	                    return [2 /*return*/, _b.apply(_a, [_e.sent()])];
 	                }
 	            });
@@ -29296,7 +29107,7 @@
 	                switch (_c.label) {
 	                    case 0:
 	                        _b = (_a = this.accessors).setItem;
-	                        return [4 /*yield*/, this._key(key, COMMON_DATA_KEY)];
+	                        return [4 /*yield*/, this._key(key, Constants.CommonUser)];
 	                    case 1: return [2 /*return*/, _b.apply(_a, [_c.sent(),
 	                            JSON.stringify(value)])];
 	                }
@@ -29309,16 +29120,14 @@
 	                    case 0:
 	                        _b = (_a = JSON).parse;
 	                        _d = (_c = this.accessors).getItem;
-	                        return [4 /*yield*/, this._key(key, COMMON_DATA_KEY)];
+	                        return [4 /*yield*/, this._key(key, Constants.CommonUser)];
 	                    case 1: return [4 /*yield*/, _d.apply(_c, [_e.sent()])];
 	                    case 2: return [2 /*return*/, _b.apply(_a, [_e.sent()])];
 	                }
 	            });
 	        }); }; };
-	        this.getUserPrefix = function (userId) { return STORAGE_PREFIX + "-user-" + userId + ":"; };
-	        var storageAccessors = props.storageAccessors, items = __rest(props, ["storageAccessors"]);
-	        // TODO: Во входных параметрах теперь нету publicItems и privateItems, сделать старое добавление методов в функции add (нужно ли?)
-	        var _a = items.publicItems, publicItems = _a === void 0 ? [] : _a, _b = items.privateItems, privateItems = _b === void 0 ? [] : _b;
+	        this.getUserPrefix = function (userId) { return Constants.StoragePrefix + "-user-" + userId + ":"; };
+	        var storageAccessors = props.storageAccessors;
 	        this.accessors = storageAccessors;
 	        if (!this.accessors.multiSet) {
 	            this.accessors.multiSet = function (keyValuePairs) { return Promise.all(keyValuePairs.map(function (_a) {
@@ -29339,28 +29148,7 @@
 	        if (!this.accessors.multiRemove) {
 	            this.accessors.multiRemove = function (keys) { return Promise.all(keys.map(function (key) { return _this.accessors.removeItem(key); })); };
 	        }
-	        // This code generates public setters and getters for items
-	        privateItems.forEach(function (item) {
-	            //this.add(item);
-	            ['set', 'get'].forEach(function (method) {
-	                _this["" + method + item] = _this["_" + method + "PrivateItem"](item);
-	            });
-	        });
-	        publicItems.forEach(function (item) {
-	            // this.add(item);
-	            ['set', 'get'].forEach(function (method) {
-	                _this["" + method + item] = function () {
-	                    var args = [];
-	                    for (var _i = 0; _i < arguments.length; _i++) {
-	                        args[_i] = arguments[_i];
-	                    }
-	                    return _this["_" + method + "PublicItem"](item).apply(void 0, args.concat([COMMON_DATA_KEY]));
-	                };
-	            });
-	        });
 	        this.init();
-	        //global.S = this;
-	        //this.newInit();
 	    }
 	    // Плохая идея, т.к. login можем вообще не вызывать и подефолту должны проинициализироваться с общим пользователем и под ним и работать
 	    // @aiInit
@@ -29379,7 +29167,7 @@
 	                    case 0:
 	                        this._user = id;
 	                        console.log('   setUser', this._user);
-	                        return [4 /*yield*/, this.accessors.setItem(CURRENT_USER_KEY, id)];
+	                        return [4 /*yield*/, this.accessors.setItem(Constants.CurrentUserKey, id)];
 	                    case 1:
 	                        _a.sent();
 	                        return [2 /*return*/];
@@ -29417,58 +29205,50 @@
 	    return Storage;
 	}());
 
-	var create = function (props) {
-	    // Create storage
-	    // const Storage = { anyPreviousMethod: 3 };
+	// Метод вынесен из класса Storage, чтобы в клиентском коде не было к нему доступа. Добавлять поля можно только на этапе создания!
+	var addProperty = function (name, isPrivate, target) {
+	    if (isPrivate === void 0) { isPrivate = true; }
+	    var _target = target;
+	    Object.defineProperty(target, name, {
+	        value: {
+	            set: function (value) { return isPrivate
+	                ? _target._setPrivateItem(name)(value)
+	                : _target._setPublicItem(name)(value); },
+	            get: function () { return isPrivate
+	                ? _target._getPrivateItem(name)()
+	                : _target._getPublicItem(name)(); },
+	            remove: function () { throw 'TODO'; }
+	        }
+	    });
+	    return null;
+	};
+	var createStorage = function (props) {
 	    var storage = new Storage(props);
 	    var add = function (target, isPrivate) {
 	        if (isPrivate === void 0) { isPrivate = true; }
-	        return function (name, t) {
-	            var typedStubValue = storage.add(name, isPrivate);
-	            // interface Result extends Q {
-	            //     [k in X]: T
-	            // }
-	            // return Storage as { A: { set: (value: T) => void, get: () => T } }
+	        return (function (propertyName, propertyTypedStubValue) {
+	            var typedStubValue = addProperty(propertyName, isPrivate, target);
 	            return {
-	                //add: add(target as K),
 	                build: function () { return target; },
 	                addPrivate: addPrivate(target),
 	                addPublic: addPublic(target)
 	            };
-	        };
+	        });
 	    };
 	    var addPrivate = function (target) { return add(target); };
 	    var addPublic = function (target) { return add(target, false); };
 	    return {
-	        //add: add(storage),
 	        addPrivate: addPrivate(storage),
 	        addPublic: addPublic(storage)
 	    };
 	};
+	// Это нужно для передачи типа добовляемого свойства, т.к. на данный момент typescript не поддерживает частичный вывод аргументов типа
+	// https://github.com/Microsoft/TypeScript/pull/26349
+	// https://github.com/microsoft/TypeScript/issues/26242
 	var _ = null;
 
 	var _this$1 = undefined;
-	// window.StorageService = StorageService;
-	// const ss = new StorageService({
-	//   storageAccessors: {
-	//     setItem: async (key, value) => localStorage.setItem(key, value),
-	//     getItem: async key => localStorage.getItem(key),
-	//     removeItem: async key => localStorage.removeItem(key),
-	//     getAllKeys: async () => Object.keys(localStorage)
-	//   },
-	//   privateItems: [
-	//     'a',
-	//     'b'
-	//   ],
-	//   publicItems: [
-	//     'A',
-	//     'B'
-	//   ]
-	// });
-	// type S = typeof ss;
-	// const s: S = ss;
-	// s
-	var storage = create({
+	var storage = createStorage({
 	    storageAccessors: {
 	        setItem: function (key, value) { return __awaiter(_this$1, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, localStorage.setItem(key, value)];

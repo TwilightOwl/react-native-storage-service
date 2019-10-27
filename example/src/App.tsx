@@ -1,35 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import StorageService from '../../src';
-import { create, _ } from '../../src/creator';
+import CreateStorage, { _ } from '../../src';
 
-
-// window.StorageService = StorageService;
-
-        // const ss = new StorageService({
-        //   storageAccessors: {
-        //     setItem: async (key, value) => localStorage.setItem(key, value),
-        //     getItem: async key => localStorage.getItem(key),
-        //     removeItem: async key => localStorage.removeItem(key),
-        //     getAllKeys: async () => Object.keys(localStorage)
-        //   },
-        //   privateItems: [
-        //     'a',
-        //     'b'
-        //   ],
-        //   publicItems: [
-        //     'A',
-        //     'B'
-        //   ]
-        // });
-        
-        // type S = typeof ss;
-        // const s: S = ss;
-        // s
-
-
-const storage = create({
+const storage = CreateStorage({
     storageAccessors: {
       setItem: async (key, value) => localStorage.setItem(key, value),
       getItem: async key => localStorage.getItem(key),
