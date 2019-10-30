@@ -79,13 +79,43 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
       );
     };
 
+
+  // =============== Storage manipulations ================
+
+  private _key = async (
+    key: string | string[],
+    user?: string
+  ): Promise<string | string[]> => {
+    const prefix = this.getUserPrefix(user === undefined ? await this.getUser() : user);
+    const resultKeys = ([] as string[]).concat(key).map(key => `${prefix}${key}`);
+    return key instanceof Array ? resultKeys : resultKeys[0];
+  };
+
+  private getUserPrefix = (userId: string) => `${Types.Constants.StoragePrefix}-user-${userId}:`;
+
+  private _setItem = async (key: string, value: any, common = false) => (
+    this.accessors.setItem(
+      (await this._key(key, common ? Types.Constants.CommonUser : undefined)) as string, 
+      value
+    )
+  )
+
+  private _getItem = async (key: string, common = false) => (
+    this.accessors.getItem((await this._key(key, common ? Types.Constants.CommonUser : undefined)) as string)
+  )
+
+  private _removeItem = async (key: string, common = false) => (
+    this.accessors.removeItem((await this._key(key, common ? Types.Constants.CommonUser : undefined)) as string)
+  )
+
+
   // ========= AsyncStorage API for current user: =========
 
-  public removeItem = async (key: string) => this.accessors.removeItem((await this._key(key)) as string)
-
-  public getItem = async (key: string) => this.accessors.getItem((await this._key(key)) as string)
-
-  public setItem = async (key: string, value: any) => this.accessors.setItem((await this._key(key)) as string, value)
+  public setItem = (key: string, value: any) => this._setItem(key, value)
+  
+  public getItem = (key: string) => this._getItem(key)
+  
+  public removeItem = (key: string) => this._removeItem(key)
   
   public getAllKeys = async (): Promise<string[]> => {
     const prefix = this.getUserPrefix(await this.getUser());
@@ -104,54 +134,5 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
   public multiGet = async (keys: string[]) => this.accessors.multiGet!((await this._key(keys)) as string[])
 
   public multiRemove = async (keys: string[]) => this.accessors.multiRemove!((await this._key(keys)) as string[])
-
-  private _key = async (
-    key: string | string[],
-    user?: string
-  ): Promise<string | string[]> => {
-    const prefix = this.getUserPrefix(user === undefined ? await this.getUser() : user);
-    const resultKeys = ([] as string[]).concat(key).map(key => `${prefix}${key}`);
-    return key instanceof Array ? resultKeys : resultKeys[0];
-  };
-
-  private _setPrivateItem = <T>(key: string) => async (
-    value: T
-  ): Promise<void> => {
-    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
-    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
-    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-    await this.accessors.setItem(
-      (await this._key(key)) as string,
-      JSON.stringify(value)
-    );
-  };
-
-  private _getPrivateItem = <T>(key: string) => async (): Promise<T> => {
-    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
-    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
-    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-    return JSON.parse(
-      await this.accessors.getItem((await this._key(key)) as string)
-    ) as T;
-  };
-
-  private _setPublicItem = <T>(key: string) => async (
-    value: T
-  ): Promise<any> => {
-    return this.accessors.setItem(
-      (await this._key(key, Types.Constants.CommonUser) as string),
-      JSON.stringify(value)
-    );
-  };
-
-  private _getPublicItem = <T>(key: string) => async (): Promise<T> => {
-    return JSON.parse(
-      await this.accessors.getItem(
-        await this._key(key, Types.Constants.CommonUser) as string
-      )
-    ) as T
-  };
-
-  private getUserPrefix = (userId: string) => `${Types.Constants.StoragePrefix}-user-${userId}:`;
   
 }

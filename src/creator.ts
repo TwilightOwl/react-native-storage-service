@@ -20,24 +20,17 @@ interface PropertyAccessors<T> {
 // Метод вынесен из класса Storage, чтобы в клиентском коде не было к нему доступа. Добавлять поля можно только на этапе создания!
 const addProperty = <T, Target>(name: string, isPrivate = true, target: Target) => {
   type TargetWithPrivateMethods = Target & {
-    _setPrivateItem: <T>(name: string) => (value: T) => Promise<void>,
-    _setPublicItem: <T>(name: string) => (value: T) => Promise<void>,
-    _getPrivateItem: <T>(name: string) => () => Promise<T>,
-    _getPublicItem: <T>(name: string) => () => Promise<T>,
+    _setItem: <T>(name: string, value: T, common?: boolean) => Promise<void>,
+    _getItem: <T>(name: string, common?: boolean) => Promise<T>,
+    _removeItem: (name: string, common?: boolean) => Promise<void>
   };
   const _target = target as TargetWithPrivateMethods;
   Object.defineProperty(
     target, name, {
       value: {
-        set: (value: T): Promise<void> => isPrivate
-          ? _target._setPrivateItem<T>(name)(value)
-          : _target._setPublicItem<T>(name)(value)
-        ,
-        get: (): Promise<T> => isPrivate
-          ? _target._getPrivateItem<T>(name)()
-          : _target._getPublicItem<T>(name)()
-        ,
-        remove: () => { throw 'TODO' }
+        set: (value: T): Promise<void> => _target._setItem(name, JSON.stringify(value), !isPrivate),
+        get: async (): Promise<T> => JSON.parse(await _target._getItem(name, !isPrivate)),
+        remove: (): Promise<void> => _target._removeItem(name, !isPrivate)
       } as PropertyAccessors<T>
     }
   );

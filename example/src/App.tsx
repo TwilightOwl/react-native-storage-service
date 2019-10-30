@@ -25,6 +25,8 @@ const storage = CreateStorage({
   storage.A.set(10)
   storage.A.get().then(console.log)
   storage.c.set({a:{b: [1,2,3]}})
+  await new Promise(r => setTimeout(r, 3000))
+  storage.A.remove()
 })()
 
 window.storage = storage;

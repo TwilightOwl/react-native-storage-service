@@ -28975,31 +28975,78 @@
 	                }
 	            });
 	        }); };
+	        // =============== Storage manipulations ================
+	        this._key = function (key, user) { return __awaiter(_this, void 0, Promise, function () {
+	            var prefix, _a, _b, resultKeys;
+	            return __generator(this, function (_c) {
+	                switch (_c.label) {
+	                    case 0:
+	                        _a = this.getUserPrefix;
+	                        if (!(user === undefined)) return [3 /*break*/, 2];
+	                        return [4 /*yield*/, this.getUser()];
+	                    case 1:
+	                        _b = _c.sent();
+	                        return [3 /*break*/, 3];
+	                    case 2:
+	                        _b = user;
+	                        _c.label = 3;
+	                    case 3:
+	                        prefix = _a.apply(this, [_b]);
+	                        resultKeys = [].concat(key).map(function (key) { return "" + prefix + key; });
+	                        return [2 /*return*/, key instanceof Array ? resultKeys : resultKeys[0]];
+	                }
+	            });
+	        }); };
+	        this.getUserPrefix = function (userId) { return Constants.StoragePrefix + "-user-" + userId + ":"; };
+	        this._setItem = function (key, value, common) {
+	            if (common === void 0) { common = false; }
+	            return __awaiter(_this, void 0, void 0, function () {
+	                var _a, _b;
+	                return __generator(this, function (_c) {
+	                    switch (_c.label) {
+	                        case 0:
+	                            _b = (_a = this.accessors).setItem;
+	                            return [4 /*yield*/, this._key(key, common ? Constants.CommonUser : undefined)];
+	                        case 1: return [2 /*return*/, (_b.apply(_a, [(_c.sent()),
+	                                value]))];
+	                    }
+	                });
+	            });
+	        };
+	        this._getItem = function (key, common) {
+	            if (common === void 0) { common = false; }
+	            return __awaiter(_this, void 0, void 0, function () {
+	                var _a, _b;
+	                return __generator(this, function (_c) {
+	                    switch (_c.label) {
+	                        case 0:
+	                            _b = (_a = this.accessors).getItem;
+	                            return [4 /*yield*/, this._key(key, common ? Constants.CommonUser : undefined)];
+	                        case 1: return [2 /*return*/, (_b.apply(_a, [(_c.sent())]))];
+	                    }
+	                });
+	            });
+	        };
+	        this._removeItem = function (key, common) {
+	            if (common === void 0) { common = false; }
+	            return __awaiter(_this, void 0, void 0, function () {
+	                var _a, _b;
+	                return __generator(this, function (_c) {
+	                    switch (_c.label) {
+	                        case 0:
+	                            _b = (_a = this.accessors).removeItem;
+	                            return [4 /*yield*/, this._key(key, common ? Constants.CommonUser : undefined)];
+	                        case 1: return [2 /*return*/, (_b.apply(_a, [(_c.sent())]))
+	                            // ========= AsyncStorage API for current user: =========
+	                        ];
+	                    }
+	                });
+	            });
+	        };
 	        // ========= AsyncStorage API for current user: =========
-	        this.removeItem = function (key) { return __awaiter(_this, void 0, void 0, function () { var _a, _b; return __generator(this, function (_c) {
-	            switch (_c.label) {
-	                case 0:
-	                    _b = (_a = this.accessors).removeItem;
-	                    return [4 /*yield*/, this._key(key)];
-	                case 1: return [2 /*return*/, _b.apply(_a, [(_c.sent())])];
-	            }
-	        }); }); };
-	        this.getItem = function (key) { return __awaiter(_this, void 0, void 0, function () { var _a, _b; return __generator(this, function (_c) {
-	            switch (_c.label) {
-	                case 0:
-	                    _b = (_a = this.accessors).getItem;
-	                    return [4 /*yield*/, this._key(key)];
-	                case 1: return [2 /*return*/, _b.apply(_a, [(_c.sent())])];
-	            }
-	        }); }); };
-	        this.setItem = function (key, value) { return __awaiter(_this, void 0, void 0, function () { var _a, _b; return __generator(this, function (_c) {
-	            switch (_c.label) {
-	                case 0:
-	                    _b = (_a = this.accessors).setItem;
-	                    return [4 /*yield*/, this._key(key)];
-	                case 1: return [2 /*return*/, _b.apply(_a, [(_c.sent()), value])];
-	            }
-	        }); }); };
+	        this.setItem = function (key, value) { return _this._setItem(key, value); };
+	        this.getItem = function (key) { return _this._getItem(key); };
+	        this.removeItem = function (key) { return _this._removeItem(key); };
 	        this.getAllKeys = function () { return __awaiter(_this, void 0, Promise, function () {
 	            var prefix, _a, getPublicKey;
 	            return __generator(this, function (_b) {
@@ -29039,92 +29086,6 @@
 	                case 1: return [2 /*return*/, _b.apply(_a, [(_c.sent())])];
 	            }
 	        }); }); };
-	        this._key = function (key, user) { return __awaiter(_this, void 0, Promise, function () {
-	            var prefix, _a, _b, resultKeys;
-	            return __generator(this, function (_c) {
-	                switch (_c.label) {
-	                    case 0:
-	                        _a = this.getUserPrefix;
-	                        if (!(user === undefined)) return [3 /*break*/, 2];
-	                        return [4 /*yield*/, this.getUser()];
-	                    case 1:
-	                        _b = _c.sent();
-	                        return [3 /*break*/, 3];
-	                    case 2:
-	                        _b = user;
-	                        _c.label = 3;
-	                    case 3:
-	                        prefix = _a.apply(this, [_b]);
-	                        resultKeys = [].concat(key).map(function (key) { return "" + prefix + key; });
-	                        return [2 /*return*/, key instanceof Array ? resultKeys : resultKeys[0]];
-	                }
-	            });
-	        }); };
-	        this._setPrivateItem = function (key) { return function (value) { return __awaiter(_this, void 0, Promise, function () {
-	            var _a, _b;
-	            return __generator(this, function (_c) {
-	                switch (_c.label) {
-	                    case 0:
-	                        _b = (_a = this.accessors).setItem;
-	                        return [4 /*yield*/, this._key(key)];
-	                    case 1: 
-	                    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
-	                    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
-	                    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-	                    return [4 /*yield*/, _b.apply(_a, [(_c.sent()),
-	                            JSON.stringify(value)])];
-	                    case 2:
-	                        // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
-	                        // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
-	                        // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-	                        _c.sent();
-	                        return [2 /*return*/];
-	                }
-	            });
-	        }); }; };
-	        this._getPrivateItem = function (key) { return function () { return __awaiter(_this, void 0, Promise, function () {
-	            var _a, _b, _c, _d;
-	            return __generator(this, function (_e) {
-	                switch (_e.label) {
-	                    case 0:
-	                        _b = (_a = JSON).parse;
-	                        _d = (_c = this.accessors).getItem;
-	                        return [4 /*yield*/, this._key(key)];
-	                    case 1: return [4 /*yield*/, _d.apply(_c, [(_e.sent())])];
-	                    case 2: 
-	                    // У общего пользователя тоже могут быть приватные поля и они не доступны залогиненному пользователю. Т.к. по бизнес логике вполне могут быть такие ситуации
-	                    // По сути common это такой же пользователь как и другие, но другие пользователи могут иметь доступ к его публичным полям.
-	                    // Все публичные поля - это поля пользователя common, а приватные поля у каждого пользователя свои
-	                    return [2 /*return*/, _b.apply(_a, [_e.sent()])];
-	                }
-	            });
-	        }); }; };
-	        this._setPublicItem = function (key) { return function (value) { return __awaiter(_this, void 0, Promise, function () {
-	            var _a, _b;
-	            return __generator(this, function (_c) {
-	                switch (_c.label) {
-	                    case 0:
-	                        _b = (_a = this.accessors).setItem;
-	                        return [4 /*yield*/, this._key(key, Constants.CommonUser)];
-	                    case 1: return [2 /*return*/, _b.apply(_a, [_c.sent(),
-	                            JSON.stringify(value)])];
-	                }
-	            });
-	        }); }; };
-	        this._getPublicItem = function (key) { return function () { return __awaiter(_this, void 0, Promise, function () {
-	            var _a, _b, _c, _d;
-	            return __generator(this, function (_e) {
-	                switch (_e.label) {
-	                    case 0:
-	                        _b = (_a = JSON).parse;
-	                        _d = (_c = this.accessors).getItem;
-	                        return [4 /*yield*/, this._key(key, Constants.CommonUser)];
-	                    case 1: return [4 /*yield*/, _d.apply(_c, [_e.sent()])];
-	                    case 2: return [2 /*return*/, _b.apply(_a, [_e.sent()])];
-	                }
-	            });
-	        }); }; };
-	        this.getUserPrefix = function (userId) { return Constants.StoragePrefix + "-user-" + userId + ":"; };
 	        var storageAccessors = props.storageAccessors;
 	        this.accessors = storageAccessors;
 	        if (!this.accessors.multiSet) {
@@ -29201,19 +29162,23 @@
 	    return Storage;
 	}());
 
+	var _this$1 = undefined;
 	// Метод вынесен из класса Storage, чтобы в клиентском коде не было к нему доступа. Добавлять поля можно только на этапе создания!
 	var addProperty = function (name, isPrivate, target) {
 	    if (isPrivate === void 0) { isPrivate = true; }
 	    var _target = target;
 	    Object.defineProperty(target, name, {
 	        value: {
-	            set: function (value) { return isPrivate
-	                ? _target._setPrivateItem(name)(value)
-	                : _target._setPublicItem(name)(value); },
-	            get: function () { return isPrivate
-	                ? _target._getPrivateItem(name)()
-	                : _target._getPublicItem(name)(); },
-	            remove: function () { throw 'TODO'; }
+	            set: function (value) { return _target._setItem(name, JSON.stringify(value), !isPrivate); },
+	            get: function () { return __awaiter(_this$1, void 0, Promise, function () { var _a, _b; return __generator(this, function (_c) {
+	                switch (_c.label) {
+	                    case 0:
+	                        _b = (_a = JSON).parse;
+	                        return [4 /*yield*/, _target._getItem(name, !isPrivate)];
+	                    case 1: return [2 /*return*/, _b.apply(_a, [_c.sent()])];
+	                }
+	            }); }); },
+	            remove: function () { return _target._removeItem(name, !isPrivate); }
 	        }
 	    });
 	};
@@ -29242,19 +29207,19 @@
 	// https://github.com/microsoft/TypeScript/issues/26242
 	var _ = null;
 
-	var _this$1 = undefined;
+	var _this$2 = undefined;
 	var storage = createStorage({
 	    storageAccessors: {
-	        setItem: function (key, value) { return __awaiter(_this$1, void 0, void 0, function () { return __generator(this, function (_a) {
+	        setItem: function (key, value) { return __awaiter(_this$2, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, localStorage.setItem(key, value)];
 	        }); }); },
-	        getItem: function (key) { return __awaiter(_this$1, void 0, void 0, function () { return __generator(this, function (_a) {
+	        getItem: function (key) { return __awaiter(_this$2, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, localStorage.getItem(key)];
 	        }); }); },
-	        removeItem: function (key) { return __awaiter(_this$1, void 0, void 0, function () { return __generator(this, function (_a) {
+	        removeItem: function (key) { return __awaiter(_this$2, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, localStorage.removeItem(key)];
 	        }); }); },
-	        getAllKeys: function () { return __awaiter(_this$1, void 0, void 0, function () { return __generator(this, function (_a) {
+	        getAllKeys: function () { return __awaiter(_this$2, void 0, void 0, function () { return __generator(this, function (_a) {
 	            return [2 /*return*/, Object.keys(localStorage)];
 	        }); }); }
 	    }
@@ -29264,9 +29229,7 @@
 	    .addPrivate('b', _)
 	    .addPrivate('c', _)
 	    .build();
-	//addPrivate(propertyName: string, propertyTypedStubValue: unknown): IntermediateObject<{ [x: string]: PropertyAccessors<unknown>; } & Storage<StorageServiceConstructor>>
-	//addPrivate(propertyName: string, propertyTypedStubValue: unknown): IntermediateObject<{ [x: string]: PropertyAccessors<unknown>; } & { a: PropertyAccessors<Function>; } & Storage<StorageServiceConstructor>>
-	(function () { return __awaiter(_this$1, void 0, void 0, function () {
+	(function () { return __awaiter(_this$2, void 0, void 0, function () {
 	    return __generator(this, function (_a) {
 	        switch (_a.label) {
 	            case 0: return [4 /*yield*/, storage.login('user')];
@@ -29281,6 +29244,10 @@
 	                storage.A.set(10);
 	                storage.A.get().then(console.log);
 	                storage.c.set({ a: { b: [1, 2, 3] } });
+	                return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 3000); })];
+	            case 4:
+	                _a.sent();
+	                storage.A.remove();
 	                return [2 /*return*/];
 	        }
 	    });

@@ -11,16 +11,15 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
     getUser(): string | Promise<string>;
     retrieveCurrentUser: () => Promise<string>;
     _show: () => Promise<void>;
-    removeItem: (key: string) => Promise<void>;
-    getItem: (key: string) => Promise<string>;
+    private _key;
+    private getUserPrefix;
+    private _setItem;
+    private _getItem;
+    private _removeItem;
     setItem: (key: string, value: any) => Promise<void>;
+    getItem: (key: string) => Promise<string>;
+    removeItem: (key: string) => Promise<void>;
     getAllKeys: () => Promise<string[]>;
     multiGet: (keys: string[]) => Promise<[string, string][]>;
     multiRemove: (keys: string[]) => Promise<void>;
-    private _key;
-    private _setPrivateItem;
-    private _getPrivateItem;
-    private _setPublicItem;
-    private _getPublicItem;
-    private getUserPrefix;
 }
