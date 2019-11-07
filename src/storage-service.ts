@@ -33,7 +33,7 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
   // }
 
   @aiInit
-  public init() {
+  private init() {
     return this.retrieveCurrentUser();
   }
 
@@ -56,28 +56,10 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
     return this._user === undefined ? this.retrieveCurrentUser() : this._user;
   }
 
-  public retrieveCurrentUser = async (): Promise<string> => {
+  private retrieveCurrentUser = async (): Promise<string> => {
     const result = (this._user = await this.accessors.getItem(Types.Constants.CurrentUserKey) || Types.Constants.CommonUser);
     return result
   };
-
-  public _show =
-    /**
-     * @deprecated
-     */
-    async () => {
-      const keys = await this.accessors.getAllKeys();
-      await Promise.all(
-        keys.sort().map(async key =>
-          /* tslint:disable-next-line:no-console */
-          console.log(
-            '   --- storage ---   ',
-            key,
-            await this.accessors.getItem(key)
-          )
-        )
-      );
-    };
 
 
   // =============== Storage manipulations ================
@@ -109,7 +91,7 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
   )
 
 
-  // ========= AsyncStorage API for current user: =========
+  // ========= AsyncStorage compatible API for current user: =========
 
   public setItem = (key: string, value: any) => this._setItem(key, value)
   
