@@ -29224,7 +29224,6 @@
 	        }); }); }
 	    }
 	})
-	    //.addPrivate('a', _ as number).addPrivate('b', _ as number).
 	    .addPublic('A', _)
 	    .addPrivate('b', _)
 	    .addPrivate('c', _)
@@ -29253,52 +29252,11 @@
 	    });
 	}); })();
 	window.storage = storage;
-	//debugger;
 	var App = /** @class */ (function (_super) {
 	    __extends(App, _super);
 	    function App() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    /*
-	      constructor(props) {
-	        super(props)
-	        // this.retrieve();
-	      }
-	    
-	      init = () => service.init()
-	    
-	      setPrivateA = async () => {
-	        await service.setPrivateA(1)
-	        this.retrieve()
-	      }
-	      
-	      setPrivateB = async () => {
-	        await service.setPrivateB(2)
-	        this.retrieve()
-	      }
-	    
-	      retrieve = async () => {
-	        this.setState({
-	          A: await service.getPrivateA(),
-	          B: await service.getPrivateB(),
-	        })
-	      }
-	    
-	      render() {
-	        return (
-	          <div className="App">
-	            <br/>
-	            {JSON.stringify(this.state)}
-	            <br/><br/><br/>
-	            <button onClick={this.init}>Init</button>
-	            <br/><br/><br/>
-	            <button onClick={this.setPrivateA}>setPrivateA</button>
-	            <button onClick={this.setPrivateB}>setPrivateB</button>
-	            <br/><br/><br/>
-	          </div>
-	        );
-	      }
-	      */
 	    App.prototype.render = function () { return react.createElement("div", null); };
 	    return App;
 	}(react.Component));

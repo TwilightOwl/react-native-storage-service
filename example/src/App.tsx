@@ -11,13 +11,11 @@ const storage = CreateStorage({
       getAllKeys: async () => Object.keys(localStorage)
     }
   })
-  //.addPrivate('a', _ as number).addPrivate('b', _ as number).
   .addPublic('A', _ as number)
   .addPrivate('b', _ as boolean)
   .addPrivate('c', _ as { a: { b: number[] }})
   .build();
   
-
 (async () => {
   await storage.login('user')
   await new Promise(r => setTimeout(r, 5000))
@@ -31,52 +29,8 @@ const storage = CreateStorage({
 
 window.storage = storage;
 
-  //debugger;
-
-
 class App extends React.Component {
-/*
-  constructor(props) {
-    super(props)
-    // this.retrieve();
-  }
-
-  init = () => service.init()
-
-  setPrivateA = async () => {
-    await service.setPrivateA(1)
-    this.retrieve()
-  }
-  
-  setPrivateB = async () => {
-    await service.setPrivateB(2)
-    this.retrieve()
-  }
-
-  retrieve = async () => {
-    this.setState({
-      A: await service.getPrivateA(),
-      B: await service.getPrivateB(),
-    })
-  }
-
-  render() {
-    return (
-      <div className="App">
-        <br/>
-        {JSON.stringify(this.state)}
-        <br/><br/><br/>
-        <button onClick={this.init}>Init</button>
-        <br/><br/><br/>
-        <button onClick={this.setPrivateA}>setPrivateA</button>
-        <button onClick={this.setPrivateB}>setPrivateB</button>
-        <br/><br/><br/>
-      </div>
-    );
-  }
-  */
-  
-  render() { return <div></div> }
+  render() { return <div/> }
 }
 
 export default App;
