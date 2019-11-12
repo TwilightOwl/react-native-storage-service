@@ -1,6 +1,6 @@
 {
   "name": "react-native-storage-service",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Storage wrapper with user scopes.",
   "main": "dist/react-native-storage-service.js",
   "types": "dist/index.d.ts",
