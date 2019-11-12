@@ -9,7 +9,7 @@ const env = process.env.NODE_ENV;
 const config = {
   input: 'src/index.ts',
   output: {
-    file: 'dist/react-native-storage-service.js',
+    file: 'dist/storage-service.js',
     format: 'esm',
     sourcemap: true,
     globals: {

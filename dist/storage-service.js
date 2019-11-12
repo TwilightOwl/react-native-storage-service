@@ -326,4 +326,4 @@ var typed = function () { return _; };
 
 export default createStorage;
 export { _, createStorage, typed };
-//# sourceMappingURL=react-native-storage-service.js.map
+//# sourceMappingURL=storage-service.js.map

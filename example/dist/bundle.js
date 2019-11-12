@@ -1,7 +1,7 @@
 (function (factory) {
 	typeof define === 'function' && define.amd ? define(factory) :
 	factory();
-}(function () { 'use strict';
+}((function () { 'use strict';
 
 	function unwrapExports (x) {
 		return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
@@ -29228,5 +29228,5 @@
 
 	reactDom.render(react.createElement(App, null), document.getElementById('main'));
 
-}));
+})));
 //# sourceMappingURL=bundle.js.map
