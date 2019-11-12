@@ -4,13 +4,12 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
     private initResolve?;
     private accessors;
     constructor(props: T);
-    init(): Promise<string>;
+    private init;
     private setUser;
     login: (userId: string) => Promise<void>;
     logout: () => Promise<void>;
     getUser(): string | Promise<string>;
-    retrieveCurrentUser: () => Promise<string>;
-    _show: () => Promise<void>;
+    private retrieveCurrentUser;
     private _key;
     private getUserPrefix;
     private _setItem;

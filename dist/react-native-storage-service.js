@@ -92,40 +92,6 @@ var Storage = /** @class */ (function () {
                 }
             });
         }); };
-        this._show = 
-        /**
-         * @deprecated
-         */
-        function () { return __awaiter(_this, void 0, void 0, function () {
-            var keys;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.accessors.getAllKeys()];
-                    case 1:
-                        keys = _a.sent();
-                        return [4 /*yield*/, Promise.all(keys.sort().map(function (key) { return __awaiter(_this, void 0, void 0, function () {
-                                var _a, _b, _c;
-                                return __generator(this, function (_d) {
-                                    switch (_d.label) {
-                                        case 0:
-                                            /* tslint:disable-next-line:no-console */
-                                            _b = (_a = console).log;
-                                            _c = ['   --- storage ---   ',
-                                                key];
-                                            return [4 /*yield*/, this.accessors.getItem(key)];
-                                        case 1: 
-                                        /* tslint:disable-next-line:no-console */
-                                        return [2 /*return*/, _b.apply(_a, _c.concat([_d.sent()]))];
-                                    }
-                                });
-                            }); }))];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        }); };
         // =============== Storage manipulations ================
         this._key = function (key, user) { return __awaiter(_this, void 0, void 0, function () {
             var prefix, _a, _b, resultKeys;
@@ -188,13 +154,13 @@ var Storage = /** @class */ (function () {
                             _b = (_a = this.accessors).removeItem;
                             return [4 /*yield*/, this._key(key, common ? Constants.CommonUser : undefined)];
                         case 1: return [2 /*return*/, (_b.apply(_a, [(_c.sent())]))
-                            // ========= AsyncStorage API for current user: =========
+                            // ========= AsyncStorage compatible API for current user: =========
                         ];
                     }
                 });
             });
         };
-        // ========= AsyncStorage API for current user: =========
+        // ========= AsyncStorage compatible API for current user: =========
         this.setItem = function (key, value) { return _this._setItem(key, value); };
         this.getItem = function (key) { return _this._getItem(key); };
         this.removeItem = function (key) { return _this._removeItem(key); };

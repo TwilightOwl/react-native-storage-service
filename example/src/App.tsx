@@ -27,10 +27,8 @@ const storage = CreateStorage({
   storage.A.remove()
 })()
 
-window.storage = storage;
-
 class App extends React.Component {
-  render() { return <div/> }
+  render() { return <div>See what happens in local storage via chrome devtools</div> }
 }
 
 export default App;
