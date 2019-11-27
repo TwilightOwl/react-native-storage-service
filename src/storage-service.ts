@@ -6,16 +6,18 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
   private _user?: string;
   private initResolve?: Function;
   private accessors: Types.StorageAccessors;
+  private prefix: string;
 
   constructor(props: T) {
-    const { storageAccessors } = props;
+    const { storageAccessors, storagePrefix = Types.Constants.StoragePrefix } = props;
     this.accessors = storageAccessors;
+    this.prefix = storagePrefix;
 
     if (!this.accessors.multiSet) {
       this.accessors.multiSet = keyValuePairs => Promise.all(keyValuePairs.map(([key, value]) => this.accessors.setItem(key, value))) as Promise<any>
     }
     if (!this.accessors.multiGet) {
-      this.accessors.multiGet = keys => Promise.all(keys.map(async key => [key, await this.accessors.getItem(key)] as [string, string]))
+      this.accessors.multiGet = keys => Promise.all(keys.map(async key => [key, await this.accessors.getItem(key)] as [string, string | null]))
     }
     if (!this.accessors.multiRemove) {
       this.accessors.multiRemove = keys => Promise.all(keys.map(key => this.accessors.removeItem(key))) as Promise<any>
@@ -40,7 +42,7 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
   @aiMethod
   private async setUser(id: string): Promise<void> {
     this._user = id;
-    await this.accessors.setItem(Types.Constants.CurrentUserKey, id);
+    await this.accessors.setItem(`${this.prefix}${Types.Constants.CurrentUserKey}`, id);
     // if (this.initResolve) {
     //   this.initResolve();
     //   this.initResolve = undefined;
@@ -57,7 +59,7 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
   }
 
   private retrieveCurrentUser = async (): Promise<string> => {
-    const result = (this._user = await this.accessors.getItem(Types.Constants.CurrentUserKey) || Types.Constants.CommonUser);
+    const result = (this._user = await this.accessors.getItem(`${this.prefix}${Types.Constants.CurrentUserKey}`) || Types.Constants.CommonUser);
     return result
   };
 
@@ -73,7 +75,7 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
     return key instanceof Array ? resultKeys : resultKeys[0];
   };
 
-  private getUserPrefix = (userId: string) => `${Types.Constants.StoragePrefix}-user-${userId}:`;
+  private getUserPrefix = (userId: string) => `${this.prefix}u${userId}:`;
 
   private _setItem = async (key: string, value: any, common = false) => (
     this.accessors.setItem(

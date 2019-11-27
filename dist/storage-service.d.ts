@@ -3,6 +3,7 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
     private _user?;
     private initResolve?;
     private accessors;
+    private prefix;
     constructor(props: T);
     private init;
     private setUser;
@@ -16,9 +17,9 @@ export default class Storage<T extends Types.StorageServiceConstructor> {
     private _getItem;
     private _removeItem;
     setItem: (key: string, value: any) => Promise<void>;
-    getItem: (key: string) => Promise<string>;
+    getItem: (key: string) => Promise<string | null>;
     removeItem: (key: string) => Promise<void>;
     getAllKeys: () => Promise<string[]>;
-    multiGet: (keys: string[]) => Promise<[string, string][]>;
+    multiGet: (keys: string[]) => Promise<[string, string | null][]>;
     multiRemove: (keys: string[]) => Promise<void>;
 }

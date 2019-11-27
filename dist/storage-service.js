@@ -65,9 +65,9 @@ function __generator(thisArg, body) {
 
 var Constants;
 (function (Constants) {
-    Constants["StoragePrefix"] = "storage-service";
+    Constants["StoragePrefix"] = "~";
     Constants["CurrentUserKey"] = "storage-service-current-user:";
-    Constants["CommonUser"] = "common";
+    Constants["CommonUser"] = "@";
 })(Constants || (Constants = {}));
 
 var Storage = /** @class */ (function () {
@@ -85,7 +85,7 @@ var Storage = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         _a = this;
-                        return [4 /*yield*/, this.accessors.getItem(Constants.CurrentUserKey)];
+                        return [4 /*yield*/, this.accessors.getItem("" + this.prefix + Constants.CurrentUserKey)];
                     case 1:
                         result = (_a._user = (_b.sent()) || Constants.CommonUser);
                         return [2 /*return*/, result];
@@ -114,7 +114,7 @@ var Storage = /** @class */ (function () {
                 }
             });
         }); };
-        this.getUserPrefix = function (userId) { return Constants.StoragePrefix + "-user-" + userId + ":"; };
+        this.getUserPrefix = function (userId) { return _this.prefix + "u" + userId + ":"; };
         this._setItem = function (key, value, common) {
             if (common === void 0) { common = false; }
             return __awaiter(_this, void 0, void 0, function () {
@@ -203,8 +203,9 @@ var Storage = /** @class */ (function () {
                 case 1: return [2 /*return*/, _b.apply(_a, [(_c.sent())])];
             }
         }); }); };
-        var storageAccessors = props.storageAccessors;
+        var storageAccessors = props.storageAccessors, _a = props.storagePrefix, storagePrefix = _a === void 0 ? Constants.StoragePrefix : _a;
         this.accessors = storageAccessors;
+        this.prefix = storagePrefix;
         if (!this.accessors.multiSet) {
             this.accessors.multiSet = function (keyValuePairs) { return Promise.all(keyValuePairs.map(function (_a) {
                 var key = _a[0], value = _a[1];
@@ -242,7 +243,7 @@ var Storage = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         this._user = id;
-                        return [4 /*yield*/, this.accessors.setItem(Constants.CurrentUserKey, id)];
+                        return [4 /*yield*/, this.accessors.setItem("" + this.prefix + Constants.CurrentUserKey, id)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
